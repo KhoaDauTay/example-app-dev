@@ -8,7 +8,9 @@ PERMISSION = {
         "*"
     ],
     "STORE_OWNER": [
-        {"user-model": ["list"]},
+        {"book-model": ["list"]},
+        {"order-model": ["list"]},
+        {"order-item-model": ["list"]},
         {"/": ["index"]},
     ],
     "CUSTOMER": [
@@ -18,7 +20,9 @@ PERMISSION = {
 VIEWS = {
     "ADMIN": ["*"],
     "STORE_OWNER": [
-        "user-model"
+        "order-model",
+        "book-model",
+        "order-item-model"
     ],
     "CUSTOMER": [
     ],
@@ -29,23 +33,24 @@ def get_permission(role: str, resource: str, action: str):
     permissions: list[dict] = PERMISSION.get(role)
     if permissions:
         if permissions[0] != "*":
+            count = 0
             for permission in permissions:
                 permission_resource = permission.get(resource)
                 if permission_resource:
                     if action in permission_resource:
-                        return True
+                        count += 1
                     else:
-                        return False
+                        continue
                 else:
-                    return False
-            return True
+                    continue
+            if count == 0:
+                return False
+            else:
+                return True
         else:
             return True
     else:
         return False
-
-
-
 
 
 def get_view(role: str, identity: str):
